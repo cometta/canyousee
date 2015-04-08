@@ -14,6 +14,7 @@ var express = require('express'),
 	config = require('./config'),
 	passport = require('./passport');
 
+var url = require('url');
 var redisURL = url.parse(process.env.REDISCLOUD_URL);
 
 
