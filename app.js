@@ -16,6 +16,7 @@ var express = require('express'),
 
 var url = require('url');
 var redisURL = url.parse(process.env.REDISCLOUD_URL);
+var herokuPORT = process.env.PORT;
 
 
 app.set('view engine', 'ejs');
@@ -56,4 +57,4 @@ passport.routes(app);
 app.use(errorHandlers.error);
 app.use(errorHandlers.notFound);
 
-var server = app.listen(config.port);
+var server =  app.listen(/**config.port**/ herokuPORT);
