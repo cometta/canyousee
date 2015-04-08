@@ -14,6 +14,9 @@ var express = require('express'),
 	config = require('./config'),
 	passport = require('./passport');
 
+var redisURL = url.parse(process.env.REDISCLOUD_URL);
+
+
 app.set('view engine', 'ejs');
 app.set('view options', {defaultLayout: 'layout'});
 
@@ -26,7 +29,7 @@ app.use(session({
 	saveUninitialized: true,
 	resave: true,
 	store: new RedisStore(
-		{url: config.redisUrl})
+		{url: redisURL /**config.redisUrl**/ })
 	})
 );
 app.use(passport.passport.initialize());
