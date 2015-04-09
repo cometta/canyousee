@@ -15,8 +15,12 @@ var express = require('express'),
 	passport = require('./passport');
 
 var url = require('url');
-var redisURL = url.parse(process.env.REDISCLOUD_URL);
-var herokuPORT = process.env.PORT;
+var redisURL =  process.env.REDISCLOUD_URL ? url.parse(process.env.REDISCLOUD_URL) : config.redisUrl;
+var herokuPORT = process.env.PORT || config.port;
+
+var mongoose = require('mongoose');
+var dbUrl = process.env.MONGOHQ_URL || 'mongodb://@localhost:27017/canyousee';
+var db = mongoose.connect(dbUrl, {safe: true});
 
 
 app.set('view engine', 'ejs');
@@ -31,7 +35,7 @@ app.use(session({
 	saveUninitialized: true,
 	resave: true,
 	store: new RedisStore(
-		{url: redisURL /**config.redisUrl**/ })
+		{url: redisURL})
 	})
 );
 app.use(passport.passport.initialize());
@@ -57,4 +61,4 @@ passport.routes(app);
 app.use(errorHandlers.error);
 app.use(errorHandlers.notFound);
 
-var server =  app.listen(/**config.port**/ herokuPORT);
+var server =  app.listen(herokuPORT);

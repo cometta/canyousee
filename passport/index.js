@@ -9,7 +9,7 @@ var passport = require('passport'),
 passport.use(new facebook({
 	clientID: config.facebook.appID,
 	clientSecret: config.facebook.appSecret,
-	callbackURL: config.host + config.routes.facebookAuthCallback
+	callbackURL: (process.env.websitehost ||  config.host) + config.routes.facebookAuthCallback
 },
 function(accessToken, refreshToken, profile, done){
 	done(null, profile);
@@ -18,7 +18,7 @@ function(accessToken, refreshToken, profile, done){
 passport.use(new google({
     clientID: config.google.clientID,
     clientSecret: config.google.clientSecret,
-    callbackURL: config.host + config.routes.googleAuthCallback
+    callbackURL:  (process.env.websitehost ||  config.host)  + config.routes.googleAuthCallback
 },
 function(accessToken, refreshToken, profile, done) {
 	done(null, profile);
