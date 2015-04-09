@@ -19,7 +19,7 @@ var redisURL =  process.env.REDISCLOUD_URL ? url.parse(process.env.REDISCLOUD_UR
 var herokuPORT = process.env.PORT || config.port;
 
 var mongoose = require('mongoose');
-var dbUrl = process.env.MONGOHQ_URL || 'mongodb://@localhost:27017/canyousee';
+var dbUrl = process.env.MONGOSOUP_URL || 'mongodb://@localhost:27017/canyousee';
 var db = mongoose.connect(dbUrl, {safe: true});
 
 
