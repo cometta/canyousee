@@ -62,14 +62,11 @@
 
 
   $("#playswap").swipe( {
-    fallbackToMouseEvents: false,
     allowPageScroll: "auto",
       swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
 
-        if (dir === 'up' || dir === 'down')
-          return false;
 
-        else if(direction == 'left')
+         if(direction == 'left')
             $('#nopeb').click();
         else if(direction == 'right')
                 $('#yesb').click();
