@@ -21,7 +21,7 @@ var herokuPORT = process.env.PORT || config.port;
 var mongoose = require('mongoose');
 var dbUrl = process.env.MONGOSOUP_URL || 'mongodb://@localhost:27017/canyousee';
 var db = mongoose.connect(dbUrl, {safe: true});
-
+var models = require('./models');
 
 app.set('view engine', 'ejs');
 app.set('view options', {defaultLayout: 'layout'});
@@ -38,6 +38,13 @@ app.use(session({
 		{url: redisURL})
 	})
 );
+
+app.use(function(req, res, next) {
+  if (!models.TransactionObj) return next(new Error("No models."))
+  req.models = models;
+  return next();
+});
+
 app.use(passport.passport.initialize());
 app.use(passport.passport.session());
 app.use(bodyParser.json());

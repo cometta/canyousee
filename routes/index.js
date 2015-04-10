@@ -2,6 +2,8 @@ var util = require('../middleware/utilities'),
 	config = require('../config'),
 	user = require('../passport/user');
 
+var models = require('../models');
+
 
 module.exports.index = index;
 module.exports.login = login;
@@ -58,8 +60,53 @@ function play(req, res){
 
 function playProcess(req, res){
 		console.log('anser='+req.body.ans+"  "+req.body.link);
+    console.log('>>>'+req.user.id+"  "+req.user.profileUrl +" photos="+req.user.photos+"  "+req.user.provider);
 
-		res.redirect(config.routes.play);
+
+		var transObj = new models.TransactionObj ({
+			imageUrl : req.body.link ,
+			userId : req.user.id,
+			userProvider : req.user.provider,
+			askQuestion : 'volcano-erupted',
+			answerQuestion : req.body.ans,
+			tranDate : new Date()
+
+
+		});
+
+		var query = {'imageUrl': req.body.link
+		             ,'processed' : false
+		            };
+		var doc = {
+    $set: {
+        'imageUrl': req.body.link,
+				'askQuestion' : 'volcano-erupted',
+			  'answerQuestion': 'yes',
+			  'tranDate': new Date()
+
+
+    }
+		,
+		$inc: { 'counting' : 1 }
+
+	};
+
+	var options = {upsert: true}; //create new if not exist
+
+		req.models.TransactionObj.create(transObj, function(error, transactionObjResponse) {
+    if (error) return next(error);
+
+		models.TransactionObjMaster.findOneAndUpdate(query, doc, options, function(error2){
+			if (error2)
+			  {  console.log(String(error2));  }
+
+
+      res.redirect(config.routes.play);
+  	});
+
+
+  });
+
 };
 
 

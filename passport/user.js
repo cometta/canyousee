@@ -31,12 +31,13 @@ var Users = {
 };
 
 var findByUsername = function findByUsername(username, cb){
+
 	cb(null, Users[username]);
 };
 
 var addUser = function addUser(username, password, work, cb){
 	if(Users[username] === undefined)
-	{
+	{ 
 		passUtil.passwordCreate(password, function(err, salt, password){
 			Users[username] = {
 				salt: salt,
