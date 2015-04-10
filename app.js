@@ -54,6 +54,11 @@ app.get(config.routes.logout, routes.logOut);
 app.get(config.routes.register, routes.register);
 app.post(config.routes.register, routes.registerProcess);
 app.get(config.routes.play, [util.requireAuthentication], routes.play);
+app.get(config.routes.about, [util.requireAuthentication], routes.about);
+app.get(config.routes.leaderboard, routes.leaderboard);
+app.get(config.routes.admin, [util.requireAuthentication], routes.admin);
+
+
 app.get('/error', function(req, res, next){
 	next(new Error('A contrived error'));
 });

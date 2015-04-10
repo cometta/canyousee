@@ -1,27 +1,163 @@
 <!DOCTYPE html>
-<html>
+
 <head>
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/css/cosmo.min.css">
-    <link rel="stylesheet" href="/css/style.css">
+<meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+<meta content="en-us" http-equiv="content-language"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+<meta id="viewport" name="viewport" content="initial-scale=1,minimum-scale=1,maximum-scale=1,width=device-width"/>
+
+<link href="/UI/components/reset.min.css" type="text/css" rel="stylesheet"/>
+<link href="/UI/components/site.min.css" type="text/css" rel="stylesheet"/>
+<link href="/UI/components/menu.min.css" type="text/css" rel="stylesheet"/>
+<link href="/UI/components/sidebar.min.css" type="text/css" rel="stylesheet"/>
+<link href="/UI/components/label.min.css" type="text/css" rel="stylesheet"/>
+<link href="/UI/components/transition.min.css" type="text/css" rel="stylesheet"/>
+<link href="/UI/components/icon.min.css" type="text/css" rel="stylesheet"/>
+<link href="/UI/components/image.min.css" type="text/css" rel="stylesheet"/>
+<link href="/UI/components/modal.min.css" type="text/css" rel="stylesheet"/>
+<link href="/UI/components/form.min.css" type="text/css" rel="stylesheet"/>
+<link href="/UI/components/button.min.css" type="text/css" rel="stylesheet"/>
+<link href="/UI/components/header.min.css" type="text/css" rel="stylesheet"/>
+
+
+
+<style>
+
+@media only screen and (max-width:299px) {
+	.smalls {
+		display:none;
+	}
+
+}
+
+@media only screen and (max-width:600px) {
+   .compOnly {
+   	   display:none !important;
+   }
+
+}
+
+@media only screen and (min-width:601px) {
+ .compOnly {
+   	   display:display-inline;
+   }
+}
+
+.ui.menu .item {
+ line-height: normal !important;
+}
+.cursorp {
+ cursor:pointer;
+}
+
+.inblock {
+   display:inline-block !important;
+ }
+
+ .midslot {
+
+     margin: auto;
+
+     max-width: 700px;
+     position: relative;
+     padding-left: 0;
+     padding-right: 0;
+ }
+
+ .pCont {
+
+     margin: auto;
+
+     max-width: 1440px;
+     position: relative;
+     padding-left: 0;
+     padding-right: 0;
+ }
+
+</style>
+
 </head>
+
+
 <body>
-<div class="container">
-	<div class="row">
-	    <div class="col-sm-4"><h1 class="pull-left">Title here</h1></div>
-	    <div class="col-sm-4 col-sm-offset-4 top-margin">
-	    	<div class="pull-right">
-	    <% if (isAuthenticated) { %>
-	    	<%- partial('partials/user-loggedin') %>
-	    <% } else { %>
-	    	<%- partial('partials/user-loggedout') %>
-	    <% } %>
-	    	</div>
-		</div>
-	</div>
-	<div class="row">
-	<%- body %>
-	</div>
+
+
+<div class="ui vertical labeled icon menu sidebar left" id="sidebar" style="width:260px">
+<div class="item"><h3>Main Menu</h3><div class="menu">
+
+	<a class="item" role="button" tabindex="0" href="/"><h4>Home</h4></a>
+  <a class="item" role="button" tabindex="0" href="/about"><h4>About This Project</h4></a>
+  <a class="item" role="button" tabindex="0" href="/leaderboard"><h4>Leaderboard</h4></a>
+	<a class="item" role="button" tabindex="0" href="/play"><h4>Play</h4></a>
+	<a class="item" role="button" tabindex="0" href="/admin"><h4>Admin to rewards players</h4></a>
+
+
+ <% if (isAuthenticated) { %>
+   <a class="item" role="button" tabindex="0" href="<%= routes.logout %>"><h4>Logout</h4></a>
+<% } else { %>
+  <a class="item" href="<%= routes.login %>"><h4>Login</h4></a>
+  <a class="item" href="<%= routes.register %>"><h4>Register</h4></a>
+ <% } %>
+
+
+
 </div>
+</div>
+
+</div>
+
+<div class="ui fixed menu pcont" style="">
+<div class="pCont">
+<div class="left menu">
+  <a id="m_btn" data-content="Click here to navigate menu" class="item">
+  <i class="icon content"></i></a>
+  <a style="margin-left:0.5em" role="banner" itemtype="http://schema.org/Organization" itemscope="" href="/" class="ui header"><h4 class="inblock" style="vertical-align:middle;padding-left:0.2em">Can You See</h4></a>
+  <meta itemprop="name" content="Can You See"/>
+  <meta itemprop="url" content="https://lit-beach-7370.herokuapp.com/"/>
+</div>
+
+<div id="tp_right" class="right menu">
+
+  <% if (isAuthenticated) { %>
+    <%- partial('partials/user-loggedin') %>
+  <% } else { %>
+    <%- partial('partials/user-loggedout') %>
+  <% } %>
+
+</div>
+
+</div>
+</div>
+
+<div class="pusher pcont" id="mpageload" style="padding:3.5em 0.2em 0 0.2em;background:#fff !important">
+
+
+        <%- body %>
+
+</div>
+
+
 </body>
+
+<script src="/jquery.js" ></script>
+
+<script src="/UI/components/sidebar.min.js" ></script>
+
+
+<script>
+
+
+$('#sidebar').sidebar('setting', 'transition', 'overlay');
+$('#m_btn').on('click'
+    ,
+    function(){
+      $('.sidebar') .sidebar('toggle');
+    }
+    );
+
+
+
+
+</script>
+
 </html>

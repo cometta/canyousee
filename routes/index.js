@@ -6,6 +6,9 @@ module.exports.index = index;
 module.exports.login = login;
 module.exports.logOut = logOut;
 module.exports.play = play;
+module.exports.about = about;
+module.exports.admin = admin;
+module.exports.leaderboard = leaderboard;
 module.exports.register = register;
 module.exports.registerProcess = registerProcess;
 
@@ -47,4 +50,17 @@ function logOut(req, res){
 
 function play(req, res){
 	res.render('play', {title: 'Play now'});
+};
+
+
+function about(req, res){
+	res.render('about', {title: 'About Us'});
+};
+
+function leaderboard(req, res){
+	res.render('leaderboard', {title: 'Leaderboard'});
+};
+
+function admin(req, res){
+	res.render('admin', {title: 'Admin'});
 };
