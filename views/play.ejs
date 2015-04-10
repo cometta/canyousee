@@ -1,13 +1,13 @@
 <script src="/jquery.js" ></script>
 
 
-<form method="post" class="midslot" id='playswap'>
+<form method="post" class="midslot">
   <input type="hidden" name="_csrf" value="<%= token %>">
   <input type="hidden" name="ans" id="ans"/>
   <input type="hidden" name="link" id="link" value="<%= link %>"/>
 
 
-<img src="<%= link %>" class="ui fluid image" alt="Swipe left or right">
+<img src="<%= link %>" id='playswap' class="ui fluid image" alt="Swipe left or right">
 
 <div style="text-align:center">
   <h2>Can you see Volcano eruption?</h2>
@@ -30,7 +30,7 @@
         <i class="checkmark icon"></i>
       </button>
       <div>
-        Swipe left mean no, swipe right mean yes
+        Swipe the image left mean no, swipe right mean yes
     </div>
     </div>
 
@@ -58,7 +58,17 @@
     });
 
 
+  $("#playswap").swipe( {
+      swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
 
+        if(direction == 'left')
+            $('#nopeb').click();
+        else if(direction == 'right')
+                $('#yesb').click();
+
+
+      }
+    });
   });
 
 

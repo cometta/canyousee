@@ -1,12 +1,12 @@
 <script src="/jquery.js" ></script>
 
-<form method="post"  class="midslot" id="adminswap">
+<form method="post"  class="midslot">
   <input type="hidden" name="_csrf" value="<%= token %>">
   <input type="hidden" name="ans" id="ans"/>
   <input type="hidden" name="link" id="link" value="<%= link %>"/>
 
 
-<img src="<%= link %>" class="ui fluid image" alt="Swipe left or right">
+<img src="<%= link %>" id="adminswap"class="ui fluid image" alt="Swipe left or right">
 
 <div style="text-align:center">
   <h2>Can you see Volcano eruption?</h2>
@@ -28,7 +28,7 @@
       <i class="checkmark icon"></i>
     </button>
       <div>
-        Swipe left mean no, swipe right mean yes.Admin decide whether player get rewarded
+        Swipe the image left mean no, swipe right mean yes.Admin decide whether player get rewarded
     </div>
     </div>
 
