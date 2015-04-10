@@ -58,14 +58,21 @@
     });
 
 
+
+
+
   $("#playswap").swipe( {
+    fallbackToMouseEvents: false,
+    allowPageScroll: "vertical",
       swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
 
-        if(direction == 'left')
+        if (dir === 'up' || dir === 'down')
+          return false;
+
+        else if(direction == 'left')
             $('#nopeb').click();
         else if(direction == 'right')
                 $('#yesb').click();
-        else return false;
 
       }
     });
