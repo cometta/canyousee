@@ -1,6 +1,13 @@
-<div class="midslot">
+<script src="/jquery.js" ></script>
 
-<img src="http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_CorrectedReflectance_TrueColor/default/2012-07-09/EPSG4326_250m/6/12/36.jpg" class="ui fluid image" alt="Swipe left or right">
+
+<form method="post" class="midslot" id='playswap'>
+  <input type="hidden" name="_csrf" value="<%= token %>">
+  <input type="hidden" name="ans" id="ans"/>
+  <input type="hidden" name="link" id="link" value="<%= link %>"/>
+
+
+<img src="<%= link %>" class="ui fluid image" alt="Swipe left or right">
 
 <div style="text-align:center">
   <h2>Can you see Volcano eruption?</h2>
@@ -15,13 +22,13 @@
   <div class="ui blue tag label">Score: 0</div>
   <div class="ui blue tag label">Reward: 0</div>
 </div>
-      <div class="ui black button">
+      <button class="ui black button" id='nopeb'>
         Nope
-      </div>
-      <div class="ui positive right labeled icon button">
+      </button>
+      <button class="ui positive right labeled icon button" id='yesb'>
         Yes
         <i class="checkmark icon"></i>
-      </div>
+      </button>
       <div>
         Swipe left mean no, swipe right mean yes
     </div>
@@ -30,3 +37,40 @@
 
 
 </div>
+
+
+</form>
+
+
+<script>
+
+
+
+
+  $(function(){
+
+    $('#nopeb').click(function () {
+        $('#ans').val('no');
+    });
+
+    $('#yesb').click(function () {
+        $('#ans').val('yes');
+    });
+
+
+  $("#playswap").swipe( {
+      swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
+
+        if(direction == 'left')
+            $('#nopeb').click();
+        else if(direction == 'right')
+                $('#yesb').click();
+
+
+      }
+    });
+  });
+
+
+
+</script>
