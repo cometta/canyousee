@@ -12,4 +12,15 @@ var transactionObjMasterSchema = new mongoose.Schema({
 });
 
 
+
+transactionObjMasterSchema.static({
+  adminProcessImages: function(callback){
+    this.find({processed :false}, null, {sort: { counting:-1}}, callback).limit(1);
+  }
+
+
+})
+
+
+
 module.exports = mongoose.model('TransactionObjMaster', transactionObjMasterSchema);

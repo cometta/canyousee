@@ -1,15 +1,39 @@
 <script src="/jquery.js" ></script>
 
-<form method="post"  class="midslot">
+<div id='nodata'  class="midslot" style="<% if (link) { %> display:none <% } %>">
+   <h3 style="padding:1em">No Data from players to process at the moment<h3>
+</div>
+
+<div id='plsloginwith'  class="midslot" style="<% if (user.admin) { %> display:none <% } %>">
+   <h3 style="padding:1em">Please login with <br/><br/>
+     <div>
+     username:reward
+     </div>
+    <div>
+     password:reward
+    </div>
+    <br/><br/>
+     to test out how to mass-reward players<h3>
+</div>
+
+
+<div id="mainadminpanel" class="midslot" style="<% if (!link || !user.admin) { %> display:none    <% } %>">
   <input type="hidden" name="_csrf" value="<%= token %>">
   <input type="hidden" name="ans" id="ans"/>
   <input type="hidden" name="link" id="link" value="<%= link %>"/>
 
+  <div id="loading" style="text-align:center;display:none;">
+  <div class="ui large text loader active inline"></div>
+  </div>
 
-<img src="<%= link %>" id="adminswap" class="ui fluid image" alt="Swipe left or right">
+  <div class="ui segment"  style="padding:0">
+    <div class="ui left top attached label" style="background:none;color:white;text-shadow:0 1px 0 #000;z-index:1000;display:none;" id="infoheader"></div>
+    <img src="<%= link %>" id='adminswap' class="ui image fluid " alt="Swipe left or right">
+
+  </div>
 
 <div style="text-align:center">
-  <h2>Can you see Volcano eruption?</h2>
+  <h2>Can you see wildfires burning,volcanoes erupting,icebergs cracking?</h2>
 </div>
 
 
@@ -18,7 +42,7 @@
 
 
 <div class="inblock" style="padding:0.2em">
-  <div class="ui blue tag label">Number of players played: 0</div>
+  <div class="ui blue tag label">Number of players swiped this image: <span style="font-size:2em;vertical-align:middle" id="numbplayers"><%= numberPlay%></span></div>
 </div>
     <button class="ui black button" id='nopeb'>
       Nope
@@ -28,14 +52,14 @@
       <i class="checkmark icon"></i>
     </button>
       <div>
-        Swipe the image left mean no, swipe right mean yes.Admin decide whether player get rewarded
+        Swipe the image left mean no, swipe right mean yes. Mass-reward players that idetified correct events. Swipe feature only available on latest version of browsers
     </div>
     </div>
 
 
 
 </div>
-</form>
+</div>
 
 
 <script>
@@ -47,28 +71,155 @@
 
 $(function(){
 
-  $('#nopeb').click(function () {
-      $('#ans').val('no');
-  });
 
-  $('#yesb').click(function () {
-      $('#ans').val('yes');
-  });
+          showInfotext = function(){
+          //below is just temporary fast solution,use regex in future
+          setTimeout(function(){
+            $('[name="link"]').val();
+            var parseDate =   $('[name="link"]').val().replace('http://','').replace('https://','').replace("map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_CorrectedReflectance_TrueColor/default/",'');
+            parseDate  = parseDate.substring(0, parseDate.indexOf('/'));
+            $('#infoheader').html('captured on '+parseDate+' by NASA').fadeIn('slow');
+          },0);
+
+        };
+
+        $('#adminswap').on('load', function() {
+           showInfotext();
+         });
+
+        ajaxPost = function (){
+
+            $('#infoheader').html('').hide();
+            $('#adminswap').css("display","none");
+
+            var dividedHeight= $('#adminswap').height()/2;
+            $("#loading").css('margin-top', dividedHeight).css('margin-bottom', dividedHeight).show();
 
 
 
-      $("#adminswap").swipe( {
-        allowPageScroll: "auto",
-          swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
 
 
-             if(direction == 'left')
-                $('#nopeb').click();
-            else if(direction == 'right')
-                    $('#yesb').click();
 
-          }
-        });
+
+              $('#adminswap')
+              .removeClass("animated")
+              .removeClass("slideOutRight")
+              .removeClass("slideOutLeft");
+
+
+              $.ajax({
+                  type: "POST",
+                  url: '/admin',
+                  data:  {
+                    _csrf : $('[name="_csrf"]').val(),
+                    ans : $('[name="ans"]').val(),
+                    link : $('[name="link"]').val()
+                  },
+                  success: function(outputData){
+
+                    if(outputData.error) {
+                      window.location.reload();
+                      return;
+                    }
+                    else if(outputData.link =='')
+                    {
+
+                      $('#nodata').show();
+                      $('#mainadminpanel').hide();
+
+
+                    return;
+                    }
+
+
+                    $('#nodata').hide();
+                    $('#mainadminpanel').show();
+
+
+                   $('[name="link"]').val(outputData.link);
+                   $('#adminswap').attr('src',outputData.link);
+                   $('#numbplayers').html(outputData.numberPlay);
+                   $('#adminswap').on('load', function() {
+                     $("#loading").hide();
+                     $('#adminswap').fadeIn();
+                     showInfotext();
+
+                   });
+
+
+
+
+                  },
+                  dataType: "json"
+              });
+
+
+
+
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+            $('#nopeb').click(function (e) {
+                e.preventDefault();
+
+
+                $('#ans').val('no');
+                $('#adminswap').animateCSS('slideOutLeft', function(){
+                  ajaxPost();
+                });
+
+
+
+
+            });
+
+            $('#yesb').click(function (e) {
+               e.preventDefault();
+
+
+               $('#ans').val('yes');
+                $('#adminswap').animateCSS('slideOutRight', function(){
+                  ajaxPost();
+                });
+
+
+
+
+            });
+
+
+
+
+
+
+              $("#adminswap").swipe( {
+                allowPageScroll: "auto",
+                  swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
+
+
+
+                     if(direction == 'left')
+                       $('#nopeb').click();
+
+                     else if(direction == 'right')
+                        $('#yesb').click();
+
+
+
+                  }
+                });
+
+
   });
 
 

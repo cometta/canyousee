@@ -1,69 +1,226 @@
 var passUtil = require('./password');
+var models = require('../models');
+var http = require('http');
 
-var Users = {
-	josh: {
-		salt: 'G81lJERghovMoUX5+RoasvwT7evsK1QTL33jc5pjG0w=',
-        password: 'DAq+sDiEbIR0fHnbzgKQCOJ9siV5CL6FmXKAI6mX7UY=',
-        work: 5000,
-        displayName: 'Josh',
-        id: 'josh',
-        provider: 'local',
-        username: 'josh'
-	},
-	brian: {
-		salt: 'Mh5EdMSe0WT8FedHqaCg+RIC12yUpsn/T0sAq/ttaQI=',
-		password: 'CkAMxwp9KwaAMi+RgX1QtcAi0VQ9q7tH+d0/BdRYSpY=',
-		work: 5000,
-		displayName: 'Brian',
-		id: 'brian',
-		provider: 'local',
-		username: 'brian'
-	},
-	test: {
-		displayName: 'Test',
-		id: 'test',
-		password: 'nUPpnFNFXP2Q8rIs/f25Yr4AFK6K6AVJt/xarHRAweM=',
-		provider: 'local',
-		salt: '/T/4Q6I43+VtqMTSnuHOZsNg1XCMZw6dI5SZE3rzNyY=',
-		username: 'test',
-		work: 50
-	}
-};
 
 var findByUsername = function findByUsername(username, cb){
 
-	cb(null, Users[username]);
+	models.User.find({
+		'username': username,
+		'userProvider': 'local'
+	}, function(err,col){
+
+		if(col.length >0){
+
+				col.forEach(function(doc, index) {
+							return cb(null,doc);
+				});
+		}else{
+
+
+				cb(null, null);
+		}
+
+	}).limit(1);
+
+
+
+
 };
 
 var addUser = function addUser(username, password, work, cb){
-	if(Users[username] === undefined)
-	{ 
-		passUtil.passwordCreate(password, function(err, salt, password){
-			Users[username] = {
-				salt: salt,
-				password: password,
-				work: work,
-				displayName: username,
-				id: username,
-				provider: 'local',
-				username: username
-			};
 
-			return cb(null, Users[username]);
-		});
-	}else{
-		return cb({errorCode: 1, message: 'User exists!'}, null);
-	}
+
+
+	models.User.find({
+		'username': username,
+		'userProvider': 'local'
+	}, function(err,col){
+
+		if(col.length ==0){
+
+
+
+				passUtil.passwordCreate(password, function(err, salt, password){
+
+					var newuserlocal = new models.User({
+						salt: salt,
+						password: password,
+						work: work,
+						displayName: username,
+						userId: username,
+						userProvider: 'local',
+						username: username,
+						creationDate: new Date(),
+						tranDate : new Date()
+					});
+
+					newuserlocal.save(function (err) {
+					if (err) // ...
+						console.log(err);
+
+						return cb(null, newuserlocal);
+
+					});
+
+
+
+				});
+
+
+		}else{
+
+			return cb({errorCode: 1, message: 'User exists!'}, null);
+
+
+		}
+
+
+
+	}).limit(1);
+
+
+
+
 };
 
 var updatePassword = function(username, password, work){
 	passUtil.passwordCreate(password, function(err, salt, password){
-		Users[username].salt = salt;
-		Users[username].password = password;
-		Users[username].work = work;
+		var updateuserlocal = new models.User({
+			salt: salt,
+			password: password,
+			work: work,
+			tranDate: new Date()
+		});
+
+		updateuserlocal.save(function (err) {
+		if (err) // ...
+			console.log('err');
+
+		});
 	});
+
+
+
+
+
+
+
+
 };
+
+
+var createUserIfNotExist = function(userId, provider, displayName,cb){
+
+
+		models.User.find({
+			'userId': userId,
+			'userProvider': provider
+		}, function(err,col){
+
+			if(col.length ==0){
+
+				var imageUrl='';
+				if(provider == 'google'){
+
+					getGooglePhoto(userId, function(imageUrl){
+							this.imageUrl = imageUrl;
+
+							addNewSocialUser(imageUrl,userId,provider,displayName);
+							return cb(null,imageUrl);
+					});
+
+				}else if(provider =='facebook'){
+					imageUrl = getFacebookPhoto(userId);
+					addNewSocialUser(imageUrl,userId,provider,displayName);
+					return cb(null,imageUrl);
+				}
+
+
+
+
+
+			}else{
+
+				col.forEach(function(doc, index) {
+						return cb(null,doc.thumbnailUrl);
+				});
+
+
+
+			}
+
+
+
+		}).limit(1);
+
+
+
+
+
+
+
+}
+
+function addNewSocialUser(imageUrl,userId,provider,displayName){
+
+	var user = new models.User({
+		thumbnailUrl : imageUrl,
+		userId: userId,
+		userProvider: provider,
+		creationDate:  new Date(),
+		tranDate: new Date(),
+		score: 0,
+		reward: 0,
+		displayName: displayName
+
+	});
+	user.save(function (err) {
+	if (err) // ...
+		console.log('err');
+});
+
+
+}
+
+
+function getFacebookPhoto(facebookid){
+
+		return "//graph.facebook.com/" + facebookid + "/picture?type=small";
+}
+
+function getGooglePhoto(googleid,cb){
+
+
+	 http.get({
+	        host: 'picasaweb.google.com',
+	        path: '/data/entry/api/user/'+googleid+'?alt=json'
+	    }, function(response) {
+	        // Continuously update stream with data
+	        var body = '';
+	        response.on('data', function(d) {
+	            body += d;
+	        });
+	        response.on('end', function() {
+
+	            // Data reception is done, do whatever with it!
+	            var parsed = JSON.parse(body);
+	         		var imageUrl = parsed.entry.gphoto$thumbnail.$t;
+
+							return cb(imageUrl.replace('http:','').replace('https:',''));
+	        });
+
+
+
+
+	    }).on('error', function (e) {
+    			console.log(e);
+					return cb(null);
+			});
+}
+
 
 exports.findByUsername = findByUsername;
 exports.addUser = addUser;
 exports.updatePassword = updatePassword;
+exports.createUserIfNotExist = createUserIfNotExist;

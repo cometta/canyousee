@@ -1,1 +1,0 @@
-exports.TransactionObj = require('./transactionObj');

@@ -1,1 +1,11 @@
- <div class="item"><%= user.displayName %></div> <a class="item" href="<%= routes.logout %>">Logout</a>
+ <div class="item">
+ <% if (user.photo) { %>
+<img src="<%= user.photo %>" class="ui mini rounded image inblock"/>
+ <% } else { %>
+<img src="/avatar.jpg" class="ui mini rounded image inblock"/>
+ <% } %>
+
+  <span style="vertical-align:middle">
+  <%= user.displayName %>
+  </span>
+  </div> <a class="item" href="<%= routes.logout %>">Logout</a>

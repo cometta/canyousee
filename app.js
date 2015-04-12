@@ -14,14 +14,34 @@ var express = require('express'),
 	config = require('./config'),
 	passport = require('./passport');
 
-var url = require('url');
-var redisURL =  process.env.REDISCLOUD_URL ? url.parse(process.env.REDISCLOUD_URL) : config.redisUrl;
-var herokuPORT = process.env.PORT || config.port;
+// cfenv provides access to your Cloud Foundry environment
+// for more info, see: https://www.npmjs.com/package/cfenv
+var cfenv = require('cfenv');
+// get the app environment from Cloud Foundry
+var	appEnv = cfenv.getAppEnv();
+var bluemixRedis='';
+//var bluemixMongoUrl;
+if (process.env.VCAP_SERVICES) {
+
+	var env = JSON.parse(process.env.VCAP_SERVICES);
+  var credentials = env['redis-2.6'][0]['credentials'];
+
+	bluemixRedis = 'redis://'+credentials.name+':'+credentials.password+'@'+credentials.host+':'+credentials.port;
+	//bluemixMongoUrl = env['mongodb-2.4'][0]['credentials'].url;
+}else{
+	appEnv.port='';
+}
+
+var redisURL =  bluemixRedis || process.env.REDISCLOUD_URL || config.redisURL;
+var serverPort = appEnv.port || process.env.PORT || config.port;
 
 var mongoose = require('mongoose');
 var dbUrl = process.env.MONGOSOUP_URL || 'mongodb://@localhost:27017/canyousee';
 var db = mongoose.connect(dbUrl, {safe: true});
 var models = require('./models');
+
+
+
 
 app.set('view engine', 'ejs');
 app.set('view options', {defaultLayout: 'layout'});
@@ -74,5 +94,5 @@ app.get('/error', function(req, res, next){
 passport.routes(app);
 app.use(errorHandlers.error);
 app.use(errorHandlers.notFound);
-
-var server =  app.listen(herokuPORT);
+console.log("server running on port"+serverPort);
+var server =  app.listen(serverPort);

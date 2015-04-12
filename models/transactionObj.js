@@ -15,7 +15,13 @@ var transactionObjSchema = new mongoose.Schema({
 transactionObjSchema.static({
   list: function(callback){
     this.find({}, null, {sort: {_id:-1}}, callback);
-  }
+  },
+  listImageIs: function(imageUrl,callback){
+    this.find({imageUrl: imageUrl}, null, {sort: {_id:-1}}, callback);
+  },
+
+
+
 })
 
 

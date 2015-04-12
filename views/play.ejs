@@ -1,16 +1,28 @@
 <script src="/jquery.js" ></script>
 
 
-<form method="post" class="midslot">
+<div class="midslot">
   <input type="hidden" name="_csrf" value="<%= token %>">
   <input type="hidden" name="ans" id="ans"/>
   <input type="hidden" name="link" id="link" value="<%= link %>"/>
 
+<div id="loading" style="text-align:center;display:none;">
+<div class="ui large text loader active inline"></div>
 
-<img src="<%= link %>" id='playswap' class="ui fluid image" alt="Swipe left or right">
+</div>
+
+
+<div class="ui segment"  style="padding:0">
+  <div class="ui left top attached label" style="background:none;color:white;text-shadow:0 1px 0 #000;z-index:1000;display:none;" id="infoheader"></div>
+  <img src="<%= link %>" id='playswap' class="ui image fluid " alt="Swipe left or right">
+
+</div>
+
+
+
 
 <div style="text-align:center">
-  <h2>Can you see Volcano eruption?</h2>
+  <h2>Can you see wildfires burning, volcanoes erupting, icebergs cracking?</h2>
 </div>
 
 
@@ -19,8 +31,8 @@
 
 
 <div class="inblock" style="padding:0.2em">
-  <div class="ui blue tag label">Score: 0</div>
-  <div class="ui blue tag label">Reward: 0</div>
+  <div class="ui blue tag label">Score: <span style="font-size:2em;vertical-align:middle" id="score"><%= score %></span></div>
+  <div class="ui blue tag label">Reward: <span style="font-size:2em;vertical-align:middle" id="reward"><%= reward %></span></div>
 </div>
       <button class="ui black button" id='nopeb'>
         Nope
@@ -30,7 +42,7 @@
         <i class="checkmark icon"></i>
       </button>
       <div>
-        Swipe the image left mean no, swipe right mean yes
+        Swipe the image left mean no, swipe right mean yes. Swipe feature only available on latest version of browsers
     </div>
     </div>
 
@@ -39,7 +51,7 @@
 </div>
 
 
-</form>
+</div>
 
 
 <script>
@@ -49,14 +61,112 @@
 
   $(function(){
 
-    $('#nopeb').click(function () {
+
+      showInfotext = function(){
+        //below is just temporary fast solution,use regex in future
+        setTimeout(function(){
+          $('[name="link"]').val();
+          var parseDate =   $('[name="link"]').val().replace('http://','').replace('https://','').replace("map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_CorrectedReflectance_TrueColor/default/",'');
+          parseDate  = parseDate.substring(0, parseDate.indexOf('/'));
+          $('#infoheader').html('captured on '+parseDate+' by NASA').fadeIn('slow');
+        },0);
+      };
+
+
+     $('#playswap').on('load', function() {
+        showInfotext();
+      });
+
+
+      ajaxPost = function (){
+
+          $('#infoheader').html('').hide();
+          $('#playswap').css("display","none");
+
+          var dividedHeight= $('#playswap').height()/2;
+          $("#loading").css('margin-top', dividedHeight).css('margin-bottom', dividedHeight).show();
+
+
+
+
+
+
+
+            $('#playswap')
+            .removeClass("animated")
+            .removeClass("slideOutRight")
+            .removeClass("slideOutLeft");
+
+
+            $.ajax({
+                type: "POST",
+                url: '/play',
+                data:  {
+                  _csrf : $('[name="_csrf"]').val(),
+                  ans : $('[name="ans"]').val(),
+                  link : $('[name="link"]').val()
+                },
+                success: function(outputData){
+
+
+                 $('[name="link"]').val(outputData.link);
+                 $('#playswap').attr('src',outputData.link);
+                 $('#score').html(outputData.score);
+                 $('#reward').html(outputData.reward);
+
+                 $('#playswap').on('load', function() {
+                   $("#loading").hide();
+                   $('#playswap').fadeIn();
+                   showInfotext();
+                 });
+
+
+
+
+                },
+                dataType: "json"
+            });
+
+
+
+
+
+
+
+
+
+
+      }
+
+
+
+    $('#nopeb').click(function (e) {
+        e.preventDefault();
+
+
         $('#ans').val('no');
+        $('#playswap').animateCSS('slideOutLeft', function(){
+          ajaxPost();
+        });
+
+
+
+
     });
 
-    $('#yesb').click(function () {
-        $('#ans').val('yes');
-    });
+    $('#yesb').click(function (e) {
+       e.preventDefault();
 
+
+       $('#ans').val('yes');
+        $('#playswap').animateCSS('slideOutRight', function(){
+          ajaxPost();
+        });
+
+
+
+
+    });
 
 
 
@@ -65,15 +175,31 @@
     allowPageScroll: "auto",
       swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
 
-  
+
+
          if(direction == 'left')
-            $('#nopeb').click();
-        else if(direction == 'right')
-                $('#yesb').click();
+           $('#nopeb').click();
+
+         else if(direction == 'right')
+            $('#yesb').click();
+
+
 
       }
     });
+
+
+
+
+
+
+
+
+
+
   });
+
+
 
 
 
