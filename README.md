@@ -21,5 +21,5 @@ Execute command `node app.js`
 ###### Demo Live Application
 [Live](http://canyousee.eu-gb.mybluemix.net/ "Can You See Live Application")
 
-###### Space App Challenge 2015 Project Page
+###### 2015 Space Apps Challenge Project Page
 [NASA](https://2015.spaceappschallenge.org/project/can-you-see/ "Can You See project page")
