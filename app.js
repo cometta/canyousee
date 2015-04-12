@@ -82,7 +82,7 @@ app.get(config.routes.register, routes.register);
 app.post(config.routes.register, routes.registerProcess);
 app.get(config.routes.play, [util.requireAuthentication], routes.play);
 app.post(config.routes.play, routes.playProcess);
-app.get(config.routes.about, [util.requireAuthentication], routes.about);
+app.get(config.routes.about, routes.about);
 app.get(config.routes.leaderboard, routes.leaderboard);
 app.get(config.routes.admin, [util.requireAuthentication], routes.admin);
 app.post(config.routes.admin, routes.adminProcess);

@@ -23,3 +23,6 @@ Execute command `node app.js`
 
 ###### 2015 Space Apps Challenge Project Page
 [NASA](https://2015.spaceappschallenge.org/project/can-you-see/ "Can You See project page")
+
+###### License
+The MIT License (MIT)
